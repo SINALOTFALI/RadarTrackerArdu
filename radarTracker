@@ -1,0 +1,45 @@
+#include <Servo.h>
+
+// Constants
+const int servoPin = 9;        // Servo motor pin
+const int trigPin = 7;         // Ultrasonic sensor trigger pin
+const int echoPin = 8;         // Ultrasonic sensor echo pin
+const int scanDelay = 50;      // Delay between scan steps in milliseconds
+
+// Variables
+Servo servo;
+int servoPos = 0;              // Current servo position
+
+void setup() {
+  servo.attach(servoPin);      // Attaching servo to the servo pin
+  pinMode(trigPin, OUTPUT);    // Setting trigger pin as OUTPUT
+  pinMode(echoPin, INPUT);     // Setting echo pin as INPUT
+
+  Serial.begin(9600);          // Initializing Serial communication
+}
+
+void loop() {
+  // Scanning from -90 to 90 degrees
+  for (servoPos = -90; servoPos <= 90; servoPos++) {
+    // Move servo to the current position
+    servo.write(servoPos);
+    delay(scanDelay);
+
+    // Measure distance using ultrasonic sensor
+    long duration, distance;
+    digitalWrite(trigPin, LOW);
+    delayMicroseconds(2);
+    digitalWrite(trigPin, HIGH);
+    delayMicroseconds(10);
+    digitalWrite(trigPin, LOW);
+    duration = pulseIn(echoPin, HIGH);
+    distance = (duration / 2) / 29.1;  // Calculate distance in centimeters
+
+    // Output distance and servo position
+    Serial.print("Distance: ");
+    Serial.print(distance);
+    Serial.print(" cm\t");
+    Serial.print("Servo Position: ");
+    Serial.println(servoPos);
+  }
+}
